@@ -942,7 +942,13 @@ impl<P: Phase> Rocket<P> {
         <L as Listener>::Connection: Send + 'static + Unpin,
     {
         match self.0.into_state() {
-            State::Build(s) => Rocket::from(s).ignite().await?._launch().await,
+            State::Build(s) => {
+                Rocket::from(s)
+                    .ignite()
+                    .await?
+                    ._launch_with_listener(listener)
+                    .await
+            }
             State::Ignite(s) => Rocket::from(s)._launch_with_listener(listener).await,
             State::Orbit(_) => Ok(()),
         }
